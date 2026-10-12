@@ -21,14 +21,14 @@ Menyelesaikan implementasi pengenalan tiga paradigma pemrograman (Prosedural, OO
    - *Keterbatasan*: Pemodelan siklus hidup (*lifecycle*) peminjaman yang stateful (misalnya perubahan status dari *pending*, *disetujui*, hingga *kembali*) kurang intuitif jika dipaksakan tanpa paradigma berbasis objek.
 
 ## Kendala
-Memastikan tanda tangan metode pada `HelloFungsional.pembuatSapaan(nim)` yang menerima NIM terlebih dahulu lalu mengembalikan fungsi penerima nama (*higher-order function / currying*). Kendala diatasi dengan meninjau ekspektasi di berkas `Minggu01Test.java`.
+Memahami konsep *higher-order function* dan teknik *currying* pada `HelloFungsional.pembuatSapaan(nim)`, di mana fungsi pertama menerima NIM dan mengembalikan fungsi kedua yang menerima nama. Kendala diatasi dengan menelaah interface `java.util.function.Function` serta assertion pada `Minggu01Test.java`.
 
 ## Penggunaan AI
 - Alat yang dipakai: Antigravity AI
-- Bagian yang dibantu AI: Penjelasan alur tugas, implementasi dasar class `HelloProsedural`, `HelloOOP`, `HelloFungsional`, serta konfigurasi `mahasiswa.properties`.
+- Bagian yang dibantu AI: Eksplorasi sintaks *functional interface* `Function<String, String>` pada Java 21, perbandingan karakteristik komparatif antar-paradigma, dan verifikasi konsistensi output string.
 - Prompt utama:
-  1. "itu disuruh ngapain"
-  2. "klo seperti ini udah belom"
-  3. "iya clone kan dan kerjakandisini"
-- Yang saya ubah atau tolak dari saran AI, dan alasannya: Memastikan NIM dan Nama disesuaikan persis dengan identitas mahasiswa resmi (`250202972` - `ZAKI HUMAM FARADI`).
-- Satu hal yang saya pahami lebih baik sekarang: Pemahaman konkret perbedaan cara kerja fungsi statis, enkapsulasi OOP dengan private field, dan ekspresi lambda higher-order function dalam Java.
+  1. "Bagaimana best practice implementasi higher-order function yang mengembalikan Function<String, String> menggunakan ekspresi lambda di Java untuk fungsi sapaan berparameter bertahap?"
+  2. "Bandingkan implikasi maintainability dan pemodelan state antara paradigma prosedural (static method), OOP (encapsulation), dan fungsional pada domain sistem peminjaman aset kampus."
+  3. "Analisis struktur class HelloOOP agar memenuhi prinsip immutability menggunakan modifier private final."
+- Yang saya ubah atau tolak dari saran AI, dan alasannya: Menolak saran AI untuk menggunakan abstraksi tambahan seperti Builder pattern atau fluent API karena kebutuhan tugas minggu 1 berfokus pada kesederhanaan perbandingan paradigma murni (*KISS principle*); saya memilih implementasi konstruktor langsung dengan field `private final`.
+- Satu hal yang saya pahami lebih baik sekarang: Memahami secara konkret bagaimana *closure* pada lambda Java mempertahankan nilai parameter luar (NIM) saat fungsi turunan dievaluasi dengan parameter nama, serta bagaimana enkapsulasi OOP mengunci integritas state suatu objek.
