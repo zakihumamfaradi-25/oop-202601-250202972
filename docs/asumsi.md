@@ -28,3 +28,10 @@ Salin setiap pertanyaan ambigu (nomor 1 sampai 7) ke sini dan jawab. Contoh:
 ## Asumsi lain
 
 Tambahkan di sini keputusan lain yang Anda ambil: rumus denda progresif, perubahan skema database, format error API, dan seterusnya.
+
+## A-08: Rumus denda progresif (Minggu 5)
+- Pertanyaan: Bagaimana formula perhitungan denda progresif pada implementasi `AturanDenda`?
+- Keputusan: Denda progresif dihitung dengan formula `dendaFlat + (hariTerlambat * (hariTerlambat - 1) / 2) * (dendaSatuHari / 10)`.
+- Alasan: Memastikan bahwa pada hari ke-0 denda bernilai 0, hari ke-1 identik dengan denda flat, hari-hari berikutnya tidak pernah lebih murah dari denda flat dan selalu monotonik naik (tidak pernah turun), serta pada hari ke-30 beban denda terbukti lebih berat dibanding denda flat secara proporsional terhadap tarif jenis aset.
+- Dampak ke kode: `id.ac.upb.asetpinjam.denda.DendaProgresif.hitung(Aset, int)`.
+- Tes yang membuktikan: `id.ac.upb.asetpinjam.Minggu05AbstraksiTest.dendaProgresifMemenuhiSyaratMinimal`.
