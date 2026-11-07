@@ -1,0 +1,178 @@
+@startuml class
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+
+package "id.ac.upb.asetpinjam.kontrak" {
+    interface DapatDipinjam {
+        + bisaDipinjam(): boolean
+    }
+    interface AturanDenda {
+        + hitung(aset: Aset, hariTerlambat: int): long
+    }
+}
+
+package "id.ac.upb.asetpinjam.model" {
+    enum StatusAset {
+        TERSEDIA
+        DIPINJAM
+        RUSAK
+    }
+
+    enum Kondisi {
+        BAIK
+        RUSAK_RINGAN
+        RUSAK_BERAT
+    }
+
+    enum JenisAset {
+        RUANG
+        LAPTOP
+        ALAT_LAB
+    }
+
+    enum TingkatRisiko {
+        RENDAH
+        SEDANG
+        TINGGI
+    }
+
+    enum StatusPeminjaman {
+        DIAJUKAN
+        DISETUJUI
+        DITOLAK
+        DIPINJAM
+        DIBATALKAN
+        DIKEMBALIKAN
+        TERLAMBAT
+    }
+
+    class Peminjam <<record>> {
+        - id: String
+        - nama: String
+        + Peminjam(id: String, nama: String)
+        + id(): String
+        + nama(): String
+    }
+
+    abstract class Aset {
+        - kode: String
+        - nama: String
+        - status: StatusAset
+        - kondisi: Kondisi
+        + Aset(kode: String, nama: String)
+        + getKode(): String
+        + getNama(): String
+        + getStatus(): StatusAset
+        + getKondisi(): Kondisi
+        + setNama(nama: String): void
+        + setStatus(status: StatusAset): void
+        + setKondisi(kondisi: Kondisi): void
+        + bisaDipinjam(): boolean
+        + {abstract} getJenis(): JenisAset
+        + {abstract} hitungDenda(hariTerlambat: int): long
+    }
+
+    class Ruang {
+        - kapasitas: int
+        + Ruang(kode: String, nama: String, kapasitas: int)
+        + getKapasitas(): int
+        + getJenis(): JenisAset
+        + hitungDenda(hariTerlambat: int): long
+    }
+
+    class Laptop {
+        - spesifikasi: String
+        - nomorInventaris: String
+        + Laptop(kode: String, nama: String, spesifikasi: String, nomorInventaris: String)
+        + getSpesifikasi(): String
+        + getNomorInventaris(): String
+        + getJenis(): JenisAset
+        + hitungDenda(hariTerlambat: int): long
+    }
+
+    class AlatLab {
+        - laboratorium: String
+        - tingkatRisiko: TingkatRisiko
+        + AlatLab(kode: String, nama: String, laboratorium: String, tingkatRisiko: TingkatRisiko)
+        + getLaboratorium(): String
+        + getTingkatRisiko(): TingkatRisiko
+        + getJenis(): JenisAset
+        + hitungDenda(hariTerlambat: int): long
+    }
+
+    class Peminjaman {
+        - id: String
+        - peminjam: Peminjam
+        - aset: Aset
+        - mulai: LocalDateTime
+        - selesai: LocalDateTime
+        - status: StatusPeminjaman
+        + Peminjaman(id: String, peminjam: Peminjam, aset: Aset, mulai: LocalDateTime, selesai: LocalDateTime)
+        + getId(): String
+        + getPeminjam(): Peminjam
+        + getAset(): Aset
+        + getMulai(): LocalDateTime
+        + getSelesai(): LocalDateTime
+        + getStatus(): StatusPeminjaman
+        + setStatusDariPenyimpanan(status: StatusPeminjaman): void
+        + ubahStatus(baru: StatusPeminjaman): void
+    }
+}
+
+package "id.ac.upb.asetpinjam.denda" {
+    class DendaFlat {
+        + hitung(aset: Aset, hariTerlambat: int): long
+    }
+    class DendaProgresif {
+        + hitung(aset: Aset, hariTerlambat: int): long
+    }
+}
+
+package "id.ac.upb.asetpinjam.katalog" {
+    class KatalogAset {
+        - daftar: List<Aset>
+        + tambah(aset: Aset): void
+        + semua(): List<Aset>
+        + cari(kata: String): List<Aset>
+        + cari(kata: String, jenis: JenisAset): List<Aset>
+    }
+}
+
+package "id.ac.upb.asetpinjam.jadwal" {
+    class JadwalPeminjaman {
+        - daftar: List<Peminjaman>
+        - kuotaLaptop: int
+        + JadwalPeminjaman(kuotaLaptop: int)
+        # kuotaLaptop(): int
+        # daftarMutable(): List<Peminjaman>
+        + tambah(p: Peminjaman): void
+        + bentrok(baru: Peminjaman): boolean
+        + semuaUrutMulai(): List<Peminjaman>
+        + perAset(): Map<String, List<Peminjaman>>
+        + hapus(id: String): boolean
+        + ajukan(baru: Peminjaman): void
+    }
+}
+
+DapatDipinjam <|.. Aset
+Aset <|-- Ruang
+Aset <|-- Laptop
+Aset <|-- AlatLab
+
+Aset --> StatusAset
+Aset --> Kondisi
+AlatLab --> TingkatRisiko
+
+AturanDenda <|.. DendaFlat
+AturanDenda <|.. DendaProgresif
+AturanDenda ..> Aset
+
+KatalogAset "1" o-- "*" Aset
+
+Peminjaman "1" --> "1" Peminjam
+Peminjaman "1" --> "1" Aset
+Peminjaman --> StatusPeminjaman
+
+JadwalPeminjaman "1" o-- "*" Peminjaman
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml sequence
+autonumber
+actor "Pemohon: Peminjam" as Pemohon
+participant "jadwal: JadwalPeminjaman" as Jadwal
+participant "baru: Peminjaman" as Baru
+participant "aset: Aset" as AsetObj
+database "daftar: List<Peminjaman>" as Daftar
+
+Pemohon -> Jadwal: ajukan(baru)
+activate Jadwal
+
+Jadwal -> Baru: getAset()
+activate Baru
+Baru --> Jadwal: aset
+deactivate Baru
+
+Jadwal -> AsetObj: bisaDipinjam()
+activate AsetObj
+AsetObj --> Jadwal: boolean
+deactivate AsetObj
+
+Jadwal -> Jadwal: bentrok(baru)
+activate Jadwal
+Jadwal -> Daftar: iterate / periksa waktu tumpang tindih
+deactivate Jadwal
+
+alt Skenario Bentrok (Waktu Tumpang Tindih Terdeteksi)
+    note over Jadwal: bentrok(baru) == true
+    Jadwal --> Pemohon: throw PeminjamanBentrokException("Jadwal bentrok")
+    note over Pemohon: Pengajuan ditolak, tidak disimpan
+else Skenario Sukses (Tidak Bentrok & Kuota Cukup)
+    note over Jadwal: bentrok(baru) == false
+    
+    opt Aset Jenis Laptop
+        Jadwal -> AsetObj: getJenis()
+        activate AsetObj
+        AsetObj --> Jadwal: JenisAset.LAPTOP
+        deactivate AsetObj
+        note over Jadwal: Validasi kuota aktif laptop peminjam
+    end
+
+    Jadwal -> Daftar: add(baru)
+    activate Daftar
+    Daftar --> Jadwal: true
+    deactivate Daftar
+
+    Jadwal -> Baru: getStatus()
+    activate Baru
+    Baru --> Jadwal: StatusPeminjaman.DIAJUKAN
+    deactivate Baru
+
+    Jadwal --> Pemohon: Sukses Diajukan (Status: DIAJUKAN)
+end
+
+deactivate Jadwal
+@enduml
